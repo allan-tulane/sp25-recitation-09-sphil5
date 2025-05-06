@@ -12,7 +12,7 @@ def prim(graph):
     Each tree is a set of (weight, node1, node2) tuples.    
     """
     def prim_helper(visited, frontier, tree):
-        if len(frontier) == 0:
+        if not frontier: # no more nodes to visit 
             return tree
         else:
             weight, node, parent = heappop(frontier)
@@ -29,15 +29,18 @@ def prim(graph):
                     # heappush(frontier, (distance + weight, neighbor))                
 
                 return prim_helper(visited, frontier, tree)
-        
-    # pick first node as source arbitrarily
-    source = list(graph.keys())[0]
-    frontier = []
-    heappush(frontier, (0, source, source))
-    visited = set()  # store the visited nodes (don't need distance anymore)
-    tree = set()
-    prim_helper(visited, frontier, tree)
-    return tree
+
+    trees = [] # store the trees for each component
+    visited = set() # store the visited nodes
+    
+    for i in graph.keys(): # for each staerting node
+        if i not in visited:
+            frontier = []
+            heappush(frontier, (0, i, i))
+            tree = set()
+            prim_helper(visited, frontier, tree)
+            trees.append(tree) # add the tree to the trees list
+    return trees 
 
 def test_prim():    
     graph = {
@@ -82,7 +85,22 @@ def mst_from_points(points):
       tree connecting the cities in the input.
     """
     ###TODO
-    pass
+    graph = defaultdict(set)
+    for i in range(len(points)): # find all of the edges in the graph using euclidean distance 
+        for j in range(i+1, len(points)): 
+            weight = euclidean_distance(points[i], points[j])
+            graph[points[i][0]].add((points[j][0], weight))
+            graph[points[j][0]].add((points[i][0], weight))
+
+    trees = prim(graph) # get the mst for each component 
+
+    # convert the trees into a list of edges 
+    edges = [] 
+    for tree in trees: 
+        for edge in trees: 
+            edges.append(edge) 
+            
+    return list(edges) # return the list of edges 
 
 def euclidean_distance(p1, p2):
     return sqrt((p1[1] - p2[1])**2 + (p1[2] - p2[2])**2)
